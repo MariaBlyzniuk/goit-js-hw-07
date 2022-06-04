@@ -28,7 +28,7 @@ function createGalleryMarkup(galleryItems) {
     ).join('');
 
 };
-let instance;
+
 function onGalleryOpenModal(e) {
     e.preventDefault();
     
@@ -36,20 +36,27 @@ function onGalleryOpenModal(e) {
         return;
     }
     
-    instance = basicLightbox.create(`
+    const instance = basicLightbox.create(`
         <img src="${e.target.dataset.source}" width="800" height="600">
         `,
             {
-    onShow: () => window.addEventListener('keydown', instance),
-    onClose: () => window.removeEventListener('keydown', instance),
-    },);
+                onShow: instance => {
+                    document.addEventListener('keydown', fn);
+                },
+                onClose: instance => {
+                    document.removeEventListener('keydown', fn);
+    }
+        },
+    );
+    const fn = onCloseModal(instance);
         instance.show();
 };
 
-function onCloseModal(e) {
-    if (e.code === 'Escape') {
-        instance.close();
-        
+function onCloseModal(instance) {
+    return function (e) {
+        if (e.code === 'Escape') {
+            instance.close();
+        }
     }
 };
 
